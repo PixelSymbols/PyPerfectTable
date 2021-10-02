@@ -124,8 +124,10 @@ save()
 ===
 
 function to save table in normal way (CANNOT BE USED TO LOAD IT BACK)
-===
+
 parameters:
+===
+
 ```
 self.default_cursor = ' <--'
 self.WHITE = 15 #Default white color
