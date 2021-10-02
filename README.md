@@ -124,3 +124,13 @@ save()
 ===
 
 function to save table in normal way (CANNOT BE USED TO LOAD IT BACK)
+===
+parameters:
+```
+self.default_cursor = ' <--'
+self.WHITE = 15 #Default white color
+self.red_to_green = (88,124,160,196,202,208,172,178,148,46) #color pallete
+self.enable_color = False
+self.enable_numbers = False
+self.enable_cursor = False
+```
