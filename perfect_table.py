@@ -63,14 +63,17 @@ class Table():
 		for command in args[1]:
 			k = command.split(':')
 			if k[0]=='c':
-				self.colors[int(args[0])+1]=self.sys_ifcolor(list(map(int,k[1].split(','))),len(self.title))
+				self.colors[int(args[0])+1]=self.sys_ifcolor((list(map(int,k[1].split(',')))),len(self.title))
 			else:
 				self.strokes[int(args[0])][int(k[0])]=k[1]
 	def edit_title(self,args: str):
 		args = self.sys_arguments(f'0;{args}')
 		for command in args[1]:
 			k = command.split(':')
-			self.title[k[0]]=k[1]
+			if k[0]=='c':
+				self.colors[0]=self.sys_ifcolor((list(map(int,k[1].split(',')))),3)
+			else:
+				self.title[k[0]]=k[1]
 	#REMOVE
 	def remove_stroke(self,pos=None):
 		if pos==None:
