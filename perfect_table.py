@@ -4,19 +4,12 @@ if os.name=='nt':
 
 class Cursor:
 	def __init__(self,lenX=1,lenY=1):
-		self.page = 0
-		self.cursor = [0,0]
-		self.limit = [[lenX,lenY]]
-	def move(self,x,y):
-		x = self.cursor[self.cursor][0]+x
-		y = self.cursor[self.cursor][1]+y
-		if x<self.limit[self.cursor][0] and x>=0:
-			self.cursor[self.cursor][0]=x
-		if y<self.limit[self.cursor][1] and y>=0:
-			self.cursor[self.cursor][1]=y
-	def edit_cursor(self,lenX,lenY):
-		self.limit[self.page][0] += lenX
-		self.limit[self.page][1] += lenY
+		self.cursor = 0
+		self.limit = lenY
+	def move(self,posY):
+		self.cursor+=posY
+	def edit_cursor(self,lenY):
+		self.limit += lenY
 	def place_cursor(self,x,y):
 		print(f'\u001b[{x}D',end=f'\u001b[{y}A')
 class Table():
@@ -51,9 +44,7 @@ class Table():
 			self.colors[stroke+1] = [*self.colors[stroke+1],*k*[self.WHITE]]
 			self.progress_bar.append('')
 	def add_stroke(self,*args: list):
-		self.cursor.edit_cursor(0,1)
-		"""Similar to add_title()
-		"""
+		self.cursor.edit_cursor(1)
 		args = self.sys_ifcolor(args,len(self.title))
 		self.colors.append(args[-1])
 		if len(args[:-1])<len(self.title):
@@ -71,7 +62,10 @@ class Table():
 		args = self.sys_arguments(args)
 		for command in args[1]:
 			k = command.split(':')
-			self.strokes[int(args[0])][int(k[0])]=k[1]
+			if k[0]=='c':
+				self.colors[int(args[0])+1]=self.sys_ifcolor(list(map(int,k[1].split(','))),len(self.title))
+			else:
+				self.strokes[int(args[0])][int(k[0])]=k[1]
 	def edit_title(self,args: str):
 		args = self.sys_arguments(f'0;{args}')
 		for command in args[1]:
@@ -80,8 +74,10 @@ class Table():
 	#REMOVE
 	def remove_stroke(self,pos=None):
 		if pos==None:
+			self.cursor.edit_cursor(0,1)
 			self.strokes = []
 			return
+		self.cursor.edit_cursor(-1)
 		self.strokes.pop(pos)
 	#PRINT
 	def print_title(self,s_pos=None):#DODELATB!
@@ -100,18 +96,12 @@ class Table():
 		stroke_max,title_max = self.sys_size()
 		result = ''
 		y = self.strokes[pos]
-		if s_pos==None:
-			start = 0
-			end = len(self.title)
-		else:
-			start = s_pos[0]
-			end = s_pos[1]		
 		vstick = self.color('|',self.colors[0][0])
 		for x in range(start,end+1):
 			z = self.sys_find(x,self.parameters)
 			result += vstick+self.color(str(y[x]),self.colors[pos+1][x])+z+' '*(stroke_max-len(str(y[x]))+2-len(z))
 		result = result+vstick+self.progress_bar[pos]
-		if pos==self.cursor.cursor[1] and self.enable_cursor==True:
+		if pos==self.cursor.cursor and self.enable_cursor==True:
 			result+=self.default_cursor
 		return self.sys_check_num(pos,result)
 	def print(self,s_colomns=None):#use
